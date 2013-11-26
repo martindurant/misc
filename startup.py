@@ -157,3 +157,16 @@ def iter_pickle(filename):
         except EOFError:
             f.close()
             raise StopIteration # or "break"
+            
+def imshowz(im,**kwargs):
+    """Show image normally as with imshow, but provide the data value
+    under the cursor in the status area."""
+    out = imshow(im,**kwargs)    
+    ymax,xmax = im.shape
+    def format_coord(x,y):
+        if x<0 or y<0 or x>xmax or y>ymax:
+            return "x=%6.3f      y=%6.3f"%(x,y)
+        z = im[round(y),round(x)]
+        return "x=%6.3f      y=%6.3f      z=%6.4e"%(x,y,z)
+    out.axes.format_coord = format_coord
+    return out
