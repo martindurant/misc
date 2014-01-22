@@ -170,3 +170,10 @@ def imshowz(im,**kwargs):
         return "x=%6.3f      y=%6.3f      z=%6.4e"%(x,y,z)
     out.axes.format_coord = format_coord
     return out
+    
+def is_number(string):
+    try:
+        x = float(string)
+        return True
+    except:
+        return False
