@@ -21,6 +21,10 @@ def set_logger():
     rootLogger.setLevel(logging.DEBUG)
     socketHandler = logging.handlers.SocketHandler('localhost',
                     logging.handlers.DEFAULT_TCP_LOGGING_PORT)
+    try:
+        rootLogger.removeHandler( rootLogger.handlers[0] )
+    except:
+        pass
     rootLogger.addHandler(socketHandler)
     return rootLogger
 
