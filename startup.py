@@ -4,6 +4,7 @@ Created on Fri Apr 19 15:47:07 2013
 
 @author: mdurant
 """
+from __future__ import print_function
 try:
     import sip
     sip.setapi('QString', 2)
@@ -18,7 +19,11 @@ and
 plt.tight_layout()
 """
 
-import numpy,scipy,pylab,os,sys,cPickle
+import numpy,scipy,pylab,os,sys
+try:
+    import cPickle as pickle
+except:
+    import pickle
 
 from numpy import *
 from pylab import *
@@ -69,10 +74,11 @@ mean"""
     ave = data.mean()
     if alltrue(abs((data-ave)/sig) < sigmas):
         if verbose:
-            print "Points kept: ",len(data),",  s.d.: ",sig
+            print("Points kept: ",len(data),",  s.d.: ",sig)
         return ave
     else:
-        return clipped_mean(data[abs((data-ave)/sig) < sigmas],sigmas,verbose)
+        ind = abs((data-ave)/sig) < sigmas
+        return clipped_mean(data[ind],sigmas[ind],verbose)
 
 def RMS(y,sig,axis=None):
     """Calculate (fractional) RMS for dataset, accounting for extra signal
@@ -150,30 +156,78 @@ def primefactors(x):
     return results
 
 def iter_pickle(filename):
+    """
+    Gives successive variables from a pickle file.
+    """
     f = open(filename)
     while True:
         try:
-            yield cPickle.load(f)
+            yield pickle.load(f)
         except EOFError:
             f.close()
-            raise StopIteration # or "break"
-            
-def imshowz(im,**kwargs):
+            raise StopIteration  # or "break"
+
+
+def imshowz(im, **kwargs):
     """Show image normally as with imshow, but provide the data value
     under the cursor in the status area."""
-    out = imshow(im,**kwargs)    
-    ymax,xmax = im.shape
-    def format_coord(x,y):
-        if x<0 or y<0 or x>xmax or y>ymax:
-            return "x=%6.3f      y=%6.3f"%(x,y)
-        z = im[round(y),round(x)]
-        return "x=%6.3f      y=%6.3f      z=%6.4e"%(x,y,z)
+    out = imshow(im, **kwargs)
+    ymax, xmax = im.shape
+
+    def format_coord(x, y):
+        if x < 0 or y < 0 or x > xmax or y > ymax:
+            return "x=%6.3f      y=%6.3f" % (x, y)
+        z = im[round(y), round(x)]
+        return "x=%6.3f      y=%6.3f      z=%6.4e" % (x, y, z)
     out.axes.format_coord = format_coord
     return out
-    
-def is_number(string):
-    try:
-        x = float(string)
-        return True
-    except:
-        return False
+
+
+def smooth_transition(x, f1, f2, x0, K):
+    """
+Make a smooth numerical transition between two functions.
+
+Parameters
+----------
+
+x : array
+    independent variable
+
+f1 : array
+    first function, followed where x<<x0
+
+f2 : array
+    second function, followe where x>>x0
+
+x0 : float
+    centre of transition
+
+K : float
+    speed of the transition. High K-> sharper transition.
+"""
+    return f1 + 0.5 * (1 + tanh(K * (x - x0))) * (f2 - f1)
+
+
+def square(x):
+    """
+Calculate the square of a number
+
+Parameters
+----------
+
+x : a number (int, float, complex...) or numpy array
+
+Outputs
+-------
+
+The number squared,
+
+.. math::
+    x^2
+
+Example
+-------
+>>> square(5)
+25
+"""
+    return x**2
