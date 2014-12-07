@@ -4,7 +4,7 @@ Function fitting framework.
 
 See scipy.optimize for details of the algorithms
 
-Full confidence bounds, and constrained parameters yet to be implemented.
+Constrained parameters yet to be implemented.
 
 Example
 =======
@@ -16,12 +16,13 @@ Example
 ([Parameter A: 0.999787801226, Parameter B: 4.98607108745],
  88.939580953704578, #total chi2
  0.90754674442555694) #chi2 per DoF
->>> line.residuals() 
+>>> line.residuals()
  [array of chi residuals]
 >>> line.conf(3) #3-sig (96%) confidence
 {'A': [0.99712415139531552, 1.0091247514343402],
  'B': [4.946785185933626, 5.0155508232137738]}
->>> out = line.contours('A','B',linspace(0.99,1.01,100),linspace(4.98,5.02,100))
+>>> out = line.contours('A','B',linspace(0.99,1.01,100),
+                        linspace(4.98,5.02,100))
 >>> CS = contour(linspace(0.99,1.01,100),linspace(4.98,5.02,100),out-out.min(),
             levels = arange(10))
 >>> clabel(CS)
@@ -69,16 +70,17 @@ class parameter:
 
 class model:
     """
-    Analytic model for non-liner fitting.
+    Analytic model for non-linear fitting.
     
-    Note that fit() stored the data (x,y,dy and fitted parameters) so
-    that you can call residuals, chi2, etc., if you want to use the same
-    ones, the usual case. If not, you would do residuals(pars, x=[], ...).
+    Note that fit() stores the data (x,y,dy and fitted parameters) so
+    that you can call residuals, chi2, etc. without arguments, if you
+    want to use the same values, the usual case.
+    If not, you would do residuals(pars, x=[], y=[], ...).
     
     Attributes of note:
     
     model.pars : list of parameter objects, so you could set them directly;
-        apso available as mode[parname]
+        also available as mode[parname]
     model.assign, model.func : text versions of code that is executed when 
         fitting
     model.fitpars : two options, method=[curve_fit|leastsq|one of the methods
