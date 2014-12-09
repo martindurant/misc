@@ -20,9 +20,9 @@ plt.tight_layout()
 
 import numpy,scipy,pylab,os,sys
 try:
-    import cPickle
-except ImportError:
-    import pickle as cPickle
+    import cPickle as pickle
+except:
+    import pickle
 
 from numpy import *
 from pylab import *
@@ -78,11 +78,11 @@ mean"""
     ave = data.mean()
     if alltrue(abs((data-ave)/sig) < sigmas):
         if verbose:
-            print("Points kept: "+str(len(data))+",  s.d.: "+str(sig))
+            print("Points kept: ",len(data),",  s.d.: ",sig)
         return ave
     else:
-        return clipped_mean(data[abs((data - ave) / sig) < sigmas],
-                            sigmas, verbose)
+        ind = abs((data-ave)/sig) < sigmas
+        return clipped_mean(data[ind],sigmas[ind],verbose)
 
 
 def RMS(y, sig, axis=None):
@@ -166,10 +166,13 @@ def primefactors(x):
 
 
 def iter_pickle(filename):
+    """
+    Gives successive variables from a pickle file.
+    """
     f = open(filename)
     while True:
         try:
-            yield cPickle.load(f)
+            yield pickle.load(f)
         except EOFError:
             f.close()
             raise StopIteration  # or "break"
@@ -196,3 +199,53 @@ def is_number(string):
         return True
     except:
         return False
+
+def smooth_transition(x, f1, f2, x0, K):
+    """
+Make a smooth numerical transition between two functions.
+
+Parameters
+----------
+
+x : array
+    independent variable
+
+f1 : array
+    first function, followed where x<<x0
+
+f2 : array
+    second function, followe where x>>x0
+
+x0 : float
+    centre of transition
+
+K : float
+    speed of the transition. High K-> sharper transition.
+"""
+    return f1 + 0.5 * (1 + tanh(K * (x - x0))) * (f2 - f1)
+
+
+def square(x):
+    """
+Calculate the square of a number
+
+Parameters
+----------
+
+x : a number (int, float, complex...) or numpy array
+
+Outputs
+-------
+
+The number squared,
+
+.. math::
+    x^2
+
+Example
+-------
+>>> square(5)
+25
+"""
+    return x**2
+
