@@ -70,32 +70,18 @@ class parameter:
 
 class model:
     """
-<<<<<<< HEAD
-    Analytic model for non-liner fitting.
-
-    Note that fit() stored the data (x,y,dy and fitted parameters) so
-    that you can call residuals, chi2, etc., if you want to use the same
-    ones, the usual case. If not, you would do residuals(pars, x=[], ...).
-
-=======
     Analytic model for non-linear fitting.
-    
+
     Note that fit() stores the data (x,y,dy and fitted parameters) so
     that you can call residuals, chi2, etc. without arguments, if you
     want to use the same values, the usual case.
     If not, you would do residuals(pars, x=[], y=[], ...).
-    
->>>>>>> 2b23245f5bf9c64005ab7b4e652248b0c9a1e4b4
+
     Attributes of note:
 
     model.pars : list of parameter objects, so you could set them directly;
-<<<<<<< HEAD
-        apso available as mode[parname]
-    model.assign, model.func : text versions of code that is executed when
-=======
         also available as mode[parname]
-    model.assign, model.func : text versions of code that is executed when 
->>>>>>> 2b23245f5bf9c64005ab7b4e652248b0c9a1e4b4
+    model.assign, model.func : text versions of code that is executed when
         fitting
     model.fitpars : two options, method=[curve_fit|leastsq|one of the methods
         for opt.minimize], call=[numpy|numexpr]
