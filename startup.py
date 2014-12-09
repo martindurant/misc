@@ -26,6 +26,7 @@ except ImportError:
 
 from numpy import *
 from pylab import *
+ion()
 from scipy import *
 import scipy.stats as stats
 import scipy.optimize as optimize
