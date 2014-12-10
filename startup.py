@@ -23,6 +23,7 @@ try:
     import cPickle as pickle
 except:
     import pickle
+    from importlib import relaod
 
 from numpy import *
 from pylab import *
@@ -249,3 +250,7 @@ Example
 """
     return x**2
 
+
+def print_django(inst):
+    fields = [f.name for f in inst._meta.fields]
+    return "".join("{}: {}\n".format(k, getattr(inst, k)) for k in fields)
