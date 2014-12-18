@@ -18,12 +18,12 @@ and
 plt.tight_layout()
 """
 
-import numpy,scipy,pylab,os,sys
+import numpy, scipy, pylab, os, sys
 try:
     import cPickle as pickle
 except:
     import pickle
-    from importlib import relaod
+    from importlib import reload
 
 from numpy import *
 from pylab import *
@@ -46,10 +46,12 @@ def print_err(val,err,e=True):
         expout = r"$\times10^{%i}$"
     if Emantissa < 2:
         digits = Vexponent - Eexponent+1
-        line= r"'%."+str(digits)+"f(%i)"+expout+"'%(Vmantissa,Emantissa*10,Vexponent)"
+        line = "".join([r"'%.", str(digits), "f(%i)", expout,
+                        "'%(Vmantissa,Emantissa*10,Vexponent)"])
     else:
         digits = Vexponent - Eexponent
-        line= r"'%."+str(digits)+"f(%i)"+expout+"'%(Vmantissa,Emantissa,Vexponent)"
+        line = "".join([r"'%.", str(digits), "f(%i)", expout,
+                        "'%(Vmantissa,Emantissa,Vexponent)"])
     return eval(line)
 
 
@@ -79,11 +81,11 @@ mean"""
     ave = data.mean()
     if alltrue(abs((data-ave)/sig) < sigmas):
         if verbose:
-            print("Points kept: ",len(data),",  s.d.: ",sig)
+            print("Points kept: ", len(data), ",  s.d.: ", sig)
         return ave
     else:
         ind = abs((data-ave)/sig) < sigmas
-        return clipped_mean(data[ind],sigmas[ind],verbose)
+        return clipped_mean(data[ind], sigmas[ind], verbose)
 
 
 def RMS(y, sig, axis=None):
@@ -146,8 +148,8 @@ def lininterp(x, y, newx):
             continue
         before = find(newx[i] - x > 0)[-1]
         gap = x[before+1]-x[before]
-        newy[i] = ((x[before] - newx[i]) * y[before + 1] / -gap + (x[before + 1] -
-                  newx[i]) * y[before] / gap)
+        newy[i] = ((x[before] - newx[i]) * y[before + 1] / -gap +
+                   (x[before + 1] - newx[i]) * y[before] / gap)
     return newy
 
 
@@ -201,6 +203,7 @@ def is_number(string):
     except:
         return False
 
+
 def smooth_transition(x, f1, f2, x0, K):
     """
 Make a smooth numerical transition between two functions.
@@ -252,5 +255,9 @@ Example
 
 
 def print_django(inst):
+    """
+Produce textual version of django object's fields/values - can be
+printed to the screen.
+"""
     fields = [f.name for f in inst._meta.fields]
     return "".join("{}: {}\n".format(k, getattr(inst, k)) for k in fields)
