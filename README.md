@@ -1,7 +1,7 @@
 misc
 ====
 
-Python titbits that may be useful
+Python tidbits that may be useful
 
 Notes
 ----
