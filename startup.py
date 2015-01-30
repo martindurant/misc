@@ -33,6 +33,11 @@ import scipy.stats as stats
 import scipy.optimize as optimize
 from glob import glob
 from scipy.stats import chi2
+import seaborn as sns
+sns.axes_style("darkgrid")
+sns.set_context("talk")
+# http://stanford.edu/~mwaskom/software/seaborn/tutorial/color_palettes.htm
+
 
 def print_err(val,err,e=True):
     "Produce text of the form 1.25(14)"
