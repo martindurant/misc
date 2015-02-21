@@ -4,8 +4,9 @@ This example shows how to use matplotlib to create regions of interest.
 Original code by Daniel Kornhauser, modified by M Durant.
 """
 import pylab as plt
-from skimage.draw import polygon
+from skimage.draw import polygon, circle, ellipse
 import numpy as np
+from matplotlib.patches import Ellipse
 
 class ROI:
     """Draw and ROI on a matplotlib figure, and get back the coords,
@@ -171,7 +172,139 @@ class ROI:
         self.fig.canvas.mpl_disconnect(self.events[0])
         self.fig.canvas.mpl_disconnect(self.events[1])
 
-def new_ROI(im=None):
+
+class ROIcircle(ROI):
+    def __init__(self, im, ax, fig):
+        self.circ = None    
+        self.im = im.get_size()
+        self.fig =  fig
+        self.fig.canvas.draw()
+        cid1 = fig.canvas.mpl_connect('motion_notify_event', self.motion_notify_callback)
+        cid2 = fig.canvas.mpl_connect('button_press_event', self.button_press_callback)
+        self.events = cid1,cid2
+
+    def __getstate__(self):
+        return {'im':self.im, 'circle':self.circ}
+        
+    def motion_notify_callback(self, event):
+        """Draw a line from the last selected point to current pointer
+        position. If left button is held, add points to the coords list
+        at each movement.
+        """
+        if event.inaxes: 
+            ax = event.inaxes
+            x, y = event.xdata, event.ydata
+            
+            if event.button == None and self.circ != None: # Move line around 
+                x0, y0 = self.circ.center
+                r = ((x0-x)**2 + (y0-y)**2)**0.5
+                self.circ.set_radius(r)
+                self.fig.canvas.draw()
+        
+    def button_press_callback(self, event):
+        """Left button: add point; middle button: delete point;
+        right button: fill polygon and stop interaction.
+        """
+        if event.inaxes: 
+            x, y = event.xdata, event.ydata
+            ax = event.inaxes
+            
+            if event.button == 1:  # If you press the left button
+                if self.circ == None: # if there is no line, create a line
+                    self.circ = plt.Circle((x,y), 0.5, facecolor='none', edgecolor='b')
+                    ax.add_artist(self.circ)
+                    
+                # add a segment
+                else: # if there is a line, create a segment
+                    self.circ.set_color('b')
+                    self.circ.set_alpha(0.3)
+                    self.disconnect()
+
+            elif event.button == 3 and self.circ != None: # middle button: remove last segment
+                # ax.artists.remove(self.circ)
+                self.circ.remove()
+                self.circ = None
+            self.fig.canvas.draw()
+
+
+    def get_coords(self):
+        """Returns the x,y coordinates of that have been selected
+        so far."""
+        if self.circ is not None:
+            return self.circ.center, self.circ.radius
+
+    def get_indices(self):
+        """Returns a set of points that lie inside the picked polygon."""
+        coo = self.get_coords()
+        if coo is None:
+            return None
+        (x, y), r = coo
+        return circle(y, x, r, self.im)
+
+    def remove(self):
+        """Take ROI polygon/lines off the image."""
+        if self.circ:
+            self.circ.remove()
+            self.circ = None
+        self.disconnect()
+        plt.draw()
+
+
+class ROIellipse(ROIcircle):
+    def motion_notify_callback(self, event):
+        """Draw a line from the last selected point to current pointer
+        position. If left button is held, add points to the coords list
+        at each movement.
+        """
+        if event.inaxes: 
+            ax = event.inaxes
+            x, y = event.xdata, event.ydata
+            
+            if event.button == None and self.circ != None: # Move line around 
+                x0, y0 = self.circ.center
+                self.circ.height = abs(y-y0)*2
+                self.circ.width = abs(x-x0)*2
+                self.fig.canvas.draw()
+    
+    def button_press_callback(self, event):
+        """Left button: add point; middle button: delete point;
+        right button: fill polygon and stop interaction.
+        """
+        if event.inaxes: 
+            x, y = event.xdata, event.ydata
+            ax = event.inaxes
+            
+            if event.button == 1:  # If you press the left button
+                if self.circ == None: 
+                    self.circ = Ellipse((x,y), 0.5, 0.5, facecolor='none', edgecolor='b')
+                    ax.add_artist(self.circ)
+                    
+                else: 
+                    self.circ.set_color('b')
+                    self.circ.set_alpha(0.3)
+                    self.disconnect()
+
+            elif event.button == 3 and self.circ != None: # middle button: remove last segment
+                self.circ.remove()
+                self.circ = None
+            self.fig.canvas.draw()
+
+    def get_coords(self):
+        """Returns the x,y coordinates of that have been selected
+        so far."""
+        if self.circ is not None:
+            return self.circ.center, self.circ.width, self.circ.height
+
+    def get_indices(self):
+        """Returns a set of points that lie inside the picked polygon."""
+        coo = self.get_coords()
+        if coo is None:
+            return None
+        (x, y), w, h = coo
+        return ellipse(y, x, h/2., w/2., self.im)
+
+
+def new_ROI(im=None, shape='polygon'):
     """Set up an ROI picker and return it. This is the only way that the
     ROI class should be involked. Requires an input image (the thing
     returned by imshow), or can try the latest image in the current
@@ -181,5 +314,14 @@ def new_ROI(im=None):
     if im == None: raise ValueError('No image to pick on')
     ax = im.axes
     fig = ax.figure
-    cursor = ROI(im, ax,fig)
+    if shape=='polygon' or shape=='p':
+        cursor = ROI(im, ax, fig)
+    elif shape=='circle' or shape=='c':
+        cursor = ROIcircle(im, ax, fig)
+    elif shape=='ellipse' or shape=='e':
+        cursor = ROIellipse(im, ax, fig)
+    elif shape=='rectangle' or shape=='r':
+        raise NotImplementedError("Rectangle ROI not yet created")
+    else:
+        raise ValueError("ROI shape must not understood")
     return cursor
