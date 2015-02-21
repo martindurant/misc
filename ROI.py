@@ -184,7 +184,12 @@ class ROIcircle(ROI):
         self.events = cid1,cid2
 
     def __getstate__(self):
-        return {'im':self.im, 'circle':self.circ}
+        return {'im':self.im, 'circle':(self.circ.center, self.circ.radius)}
+
+    def __setstate__(self, d):
+        self.im = d['im']
+        self.circ = plt.Circle(*d['circle'], facecolor='none', edgecolor='b')
+
         
     def motion_notify_callback(self, event):
         """Draw a line from the last selected point to current pointer
@@ -251,6 +256,14 @@ class ROIcircle(ROI):
 
 
 class ROIellipse(ROIcircle):
+    def __getstate__(self):
+        return {'im':self.im, 'circle':(self.circ.center, self.circ.width,
+                                        self.circ.height)}
+
+    def __setstate__(self, d):
+        self.im = d['im']
+        self.circ = Ellipse(*d['circle'], facecolor='none', edgecolor='b')
+
     def motion_notify_callback(self, event):
         """Draw a line from the last selected point to current pointer
         position. If left button is held, add points to the coords list
