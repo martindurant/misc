@@ -26,7 +26,7 @@ font_place = mypath+os.sep+'Humor-Sans.ttf'
     #fhandle = urllib2.urlopen('http://antiyawn.com/uploads/Humor-Sans.ttf')
     #open(font_place, 'wb').write(fhandle.read())
 #
-    
+
 def xkcd_line(x, y, xlim=None, ylim=None,
               mag=1.0, f1=30, f2=0.05, f3=15):
     """
@@ -44,7 +44,7 @@ def xkcd_line(x, y, xlim=None, ylim=None,
     f1, f2, f3 : int, float, int
         filtering parameters.  f1 gives the size of the window, f2 gives
         the high-frequency cutoff, f3 gives the size of the filter
-    
+
     Returns
     -------
     x, y : ndarrays
@@ -52,7 +52,7 @@ def xkcd_line(x, y, xlim=None, ylim=None,
     """
     x = np.asarray(x)
     y = np.asarray(y)
-    
+
     # get limits for rescaling
     if xlim is None:
         xlim = (x.min(), x.max())
@@ -61,7 +61,7 @@ def xkcd_line(x, y, xlim=None, ylim=None,
 
     if xlim[1] == xlim[0]:
         xlim = ylim
-        
+
     if ylim[1] == ylim[0]:
         ylim = xlim
 
@@ -81,7 +81,7 @@ def xkcd_line(x, y, xlim=None, ylim=None,
     # interpolate curve at sampled points
     k = min(3, len(x) - 1)
     res = interpolate.splprep([x_scaled, y_scaled], s=0, k=k)
-    x_int, y_int = interpolate.splev(u, res[0]) 
+    x_int, y_int = interpolate.splev(u, res[0])
 
     # we'll perturb perpendicular to the drawn line
     dx = x_int[2:] - x_int[:-2]
@@ -99,7 +99,7 @@ def xkcd_line(x, y, xlim=None, ylim=None,
     # un-scale data
     x_int = x_int[1:-1] * (xlim[1] - xlim[0]) + xlim[0]
     y_int = y_int[1:-1] * (ylim[1] - ylim[0]) + ylim[0]
-    
+
     return x_int, y_int
 
 
@@ -116,7 +116,7 @@ def XKCDify(ax, mag=1.0,
 
     This adjusts all lines, text, legends, and axes in the figure to look
     like xkcd plots.  Other plot elements are not modified.
-    
+
     Parameters
     ----------
     ax : Axes instance
@@ -232,12 +232,12 @@ def XKCDify(ax, mag=1.0,
     prop = fm.FontProperties(fname=font_place, size=16)
     for text in ax.texts:
         text.set_fontproperties(prop)
-    
+
     # modify legend
     leg = ax.get_legend()
     if leg is not None:
         leg.set_frame_on(False)
-        
+
         for child in leg.get_children():
             if isinstance(child, pl.Line2D):
                 x, y = child.get_data()
@@ -245,7 +245,7 @@ def XKCDify(ax, mag=1.0,
                 child.set_linewidth(2 * child.get_linewidth())
             if isinstance(child, pl.Text):
                 child.set_fontproperties(prop)
-    
+
     # Set the axis limits
     ax.set_xlim(xax_lim[0] - 0.1 * xspan,
                 xax_lim[1] + 0.1 * xspan)
@@ -254,7 +254,7 @@ def XKCDify(ax, mag=1.0,
 
     # adjust the axes
     ax.set_xticks([])
-    ax.set_yticks([])      
+    ax.set_yticks([])
 
     if expand_axes:
         ax.figure.set_facecolor(bgcolor)
@@ -262,7 +262,6 @@ def XKCDify(ax, mag=1.0,
         ax.set_position([0, 0, 1, 1])
     if matplotlib.rcParams['text.usetex']:
         matplotlib.rcParams['text.usetex'] = False
-        print "Warning: disabling TeX rendering"
     ax.set_frame_on(False)
     ax.figure.set_facecolor('w')
     matplotlib.pyplot.draw()
