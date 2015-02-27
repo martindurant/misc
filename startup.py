@@ -19,6 +19,9 @@ plt.tight_layout()
 """
 
 import numpy, scipy, pylab, os, sys
+getenv = os.environ.get
+setenv = os.environ.putenv
+delenv = os.environ.unsetenv
 try:
     import cPickle as pickle
 except:
@@ -36,6 +39,7 @@ from scipy.stats import chi2
 import seaborn as sns
 sns.axes_style("darkgrid")
 sns.set_context("talk")
+from unum import units
 # http://stanford.edu/~mwaskom/software/seaborn/tutorial/color_palettes.htm
 
 
