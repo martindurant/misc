@@ -238,6 +238,16 @@ K : float
     return f1 + 0.5 * (1 + tanh(K * (x - x0))) * (f2 - f1)
 
 
+class temp_reader(object):
+    """For read-once streams, this holds the data so that you can pass it to
+successive consumers."""
+    def __init__(self, stream):
+        self.data = stream.read()
+
+    def read(self, *args):
+        return self.data
+
+
 def square(x):
     """
 Calculate the square of a number
@@ -270,3 +280,9 @@ printed to the screen.
 """
     fields = [f.name for f in inst._meta.fields]
     return "".join("{}: {}\n".format(k, getattr(inst, k)) for k in fields)
+
+
+def ascii_string(s):
+    "Return string with ascii-only characters, e.g., Montréal->Montreal"
+    import unicodedata
+    return unicodedata.normalize('NFKD', m).encode('ASCII', 'ignore')
