@@ -286,3 +286,24 @@ def ascii_string(s):
     "Return string with ascii-only characters, e.g., Montréal->Montreal"
     import unicodedata
     return unicodedata.normalize('NFKD', m).encode('ASCII', 'ignore')
+
+
+def google_map(lat, lon, zoom):
+    """
+lat, lon: decimal coordinates
+zoom: integer between 0 (whole earth) and 20
+
+returns: image array, coordinate extent.
+"""
+    import urllib, io
+    from matplotlib import pyplot
+    url = "https://maps.googleapis.com/maps/api/staticmap?center={},{}&size=500x500&zoom={}&maptype=terrain"
+    url = url.format(lat, lon, zoom)
+    long_width = 360/2**(zoom-1)
+    lonmin = lon - long_width/2
+    lonmax = lon + long_width/2
+    latmin = lat - long_width/2 / cos(lat)  # not strictly true
+    latmax = lat + long_width/2 / cos(lat)
+    extent = [lonmin, lonmax, latmin, latmax]
+    return (pyplot.imread(io.BytesIO(urllib.request.urlopen(url).read())),
+            extent)
