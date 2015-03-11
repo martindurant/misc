@@ -307,3 +307,13 @@ returns: image array, coordinate extent.
     extent = [lonmin, lonmax, latmin, latmax]
     return (pyplot.imread(io.BytesIO(urllib.request.urlopen(url).read())),
             extent)
+
+
+def google_address_lookup(address):
+    import urllib, json
+    url = "http://maps.googleapis.com/maps/api/geocode/json?address={}"
+    url = url.format(address)
+    out = urllib.request.urlopen(url).read().decode('utf-8')
+    data = json.loads(out)
+    loc = data['results'][0]['geometry']['location']
+    return loc['lat'], loc['lng']
