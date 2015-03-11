@@ -40,6 +40,7 @@ import seaborn as sns
 sns.axes_style("darkgrid")
 sns.set_context("talk")
 from unum import units
+import re, json, csv, urllib, io, unicodedata
 # http://stanford.edu/~mwaskom/software/seaborn/tutorial/color_palettes.htm
 
 
@@ -284,7 +285,6 @@ printed to the screen.
 
 def ascii_string(s):
     "Return string with ascii-only characters, e.g., Montréal->Montreal"
-    import unicodedata
     return unicodedata.normalize('NFKD', m).encode('ASCII', 'ignore')
 
 
@@ -295,8 +295,6 @@ zoom: integer between 0 (whole earth) and 20
 
 returns: image array, coordinate extent.
 """
-    import urllib, io
-    from matplotlib import pyplot
     url = "https://maps.googleapis.com/maps/api/staticmap?center={},{}&size=500x500&zoom={}&maptype=terrain"
     url = url.format(lat, lon, zoom)
     long_width = 360/2**(zoom-1)
@@ -305,12 +303,11 @@ returns: image array, coordinate extent.
     latmin = lat - long_width/2 / cos(lat)  # not strictly true
     latmax = lat + long_width/2 / cos(lat)
     extent = [lonmin, lonmax, latmin, latmax]
-    return (pyplot.imread(io.BytesIO(urllib.request.urlopen(url).read())),
+    return (pylab.imread(io.BytesIO(urllib.request.urlopen(url).read())),
             extent)
 
 
 def google_address_lookup(address):
-    import urllib, json
     url = "http://maps.googleapis.com/maps/api/geocode/json?address={}"
     url = url.format(address)
     out = urllib.request.urlopen(url).read().decode('utf-8')
