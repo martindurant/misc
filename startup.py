@@ -186,6 +186,9 @@ def iter_pickle(f, mode='rb'):
     f : either filename or open file-like. If former, mode probably
         should be rb.
     """
+    if isinstance(f, list):
+        for fp in f:
+            yield (x for x in iter_pickle(fp, mode))
     if isinstance(f, str):
         f = open(filename, mode)
     while True:
