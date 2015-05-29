@@ -179,11 +179,15 @@ def primefactors(x):
     return results
 
 
-def iter_pickle(filename, mode='r'):
+def iter_pickle(f, mode='rb'):
     """
     Gives successive variables from a pickle file.
+
+    f : either filename or open file-like. If former, mode probably
+        should be rb.
     """
-    f = open(filename, mode)
+    if isinstance(f, str):
+        f = open(filename, mode)
     while True:
         try:
             yield pickle.load(f)
