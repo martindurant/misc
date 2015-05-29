@@ -178,19 +178,26 @@ def primefactors(x):
             prime = prime+1
     return results
 
-
-def iter_pickle(f, mode='rb'):
+def iter_pickle(f, mode='rb', gzipped=False):
     """
     Gives successive variables from a pickle file.
 
     f : either filename or open file-like. If former, mode probably
         should be rb.
+
+    gzipped : if file(s) are compressed
     """
+    import gzip
     if isinstance(f, list):
         for fp in f:
-            yield (x for x in iter_pickle(fp, mode))
+            for x in iter_pickle(fp, mode, gzipped):
+                yield x
+        raise StopIteration
     if isinstance(f, str):
-        f = open(filename, mode)
+        if gzipped:
+            f = gzip.open(f, mode)
+        else:
+            f = open(f, mode)
     while True:
         try:
             yield pickle.load(f)
