@@ -36,6 +36,7 @@ import scipy.stats as stats
 import scipy.optimize as optimize
 from glob import glob
 from scipy.stats import chi2
+import pandas as pd
 import seaborn as sns
 sns.axes_style("darkgrid")
 sns.set_context("talk")
@@ -177,12 +178,26 @@ def primefactors(x):
             prime = prime+1
     return results
 
-
-def iter_pickle(filename):
+def iter_pickle(f, mode='rb', gzipped=False):
     """
     Gives successive variables from a pickle file.
+
+    f : either filename or open file-like. If former, mode probably
+        should be rb.
+
+    gzipped : if file(s) are compressed
     """
-    f = open(filename)
+    import gzip
+    if isinstance(f, list):
+        for fp in f:
+            for x in iter_pickle(fp, mode, gzipped):
+                yield x
+        raise StopIteration
+    if isinstance(f, str):
+        if gzipped:
+            f = gzip.open(f, mode)
+        else:
+            f = open(f, mode)
     while True:
         try:
             yield pickle.load(f)
@@ -285,7 +300,7 @@ printed to the screen.
 
 def ascii_string(s):
     "Return string with ascii-only characters, e.g., Montréal->Montreal"
-    return unicodedata.normalize('NFKD', m).encode('ASCII', 'ignore')
+    return unicodedata.normalize('NFKD', s).encode('ASCII', 'ignore').decode('utf-8')
 
 
 def google_map(lat, lon, zoom):
@@ -308,9 +323,14 @@ returns: image array, coordinate extent.
 
 
 def google_address_lookup(address):
+    """See https://developers.google.com/maps/documentation/geocoding/
+    """
     url = "http://maps.googleapis.com/maps/api/geocode/json?address={}"
     url = url.format(address)
     out = urllib.request.urlopen(url).read().decode('utf-8')
     data = json.loads(out)
-    loc = data['results'][0]['geometry']['location']
+    try:
+        loc = data['results'][0]['geometry']['location']
+    except IndexError:
+        raise RuntimeError("Address look-up failed")
     return loc['lat'], loc['lng']
