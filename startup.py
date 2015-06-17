@@ -20,8 +20,8 @@ plt.tight_layout()
 
 import numpy, scipy, pylab, os, sys
 getenv = os.environ.get
-setenv = os.environ.putenv
-delenv = os.environ.unsetenv
+#setenv = os.environ.putenv
+#delenv = os.environ.unsetenv
 try:
     import cPickle as pickle
 except:
