@@ -116,10 +116,10 @@ class model:
             any additional names required by the model; by default all
             numpy names
         """
+        self.pars = sorted([parameter(p[1],p[0]) for p in pars.items()],key=lambda x: x.name)
         self.fitpars = {'method':'curve_fit','call':'numpy'}
         self.kwargs = {}
         self.expr = expr
-        self.pars = sorted([parameter(p[1],p[0]) for p in pars.items()],key=lambda x: x.name)
         self.name = name
         self.namespace = namespace
         self._make_func()
@@ -136,7 +136,10 @@ class model:
             pars = self.pars2vals()
         self._make_func()
         return self.call(x,*pars)
-
+        
+    def __getattr__(self, attr):
+        return self[attr].value
+        
     def call(self,x,*pars):
         """Calls byte-compiled assignment and (numpy) evaluation."""
         exec(self._assign)
