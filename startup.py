@@ -183,7 +183,7 @@ def iter_pickle(f, mode='rb', gzipped=False):
     Gives successive variables from a pickle file.
 
     f : either filename or open file-like. If former, mode probably
-        should be rb.
+        should be rb. Can be list of the above
 
     gzipped : if file(s) are compressed
     """
